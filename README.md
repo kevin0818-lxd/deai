@@ -25,11 +25,14 @@ python3.11 -m venv .venv
 
 ## 流程 A：使用示例权重
 
-从 [v0.1.0 Release](https://github.com/kevin0818-lxd/deai/releases/tag/v0.1.0) 下载 `adapters.safetensors` 至仓库自带的 `template/`，与 `template/adapter_config.json` 放在同一目录：
+从 [v0.1.0 Release](https://github.com/kevin0818-lxd/deai/releases/tag/v0.1.0) 下载四个 `adapters.safetensors.part-*` 附件。因单次大文件上传限制，它们是**原始权重的连续字节分片**，按顺序拼接后与 `template/adapter_config.json` 放在同一目录：
 
 ```bash
-curl -fL https://github.com/kevin0818-lxd/deai/releases/download/v0.1.0/adapters.safetensors \
-  -o template/adapters.safetensors
+for i in 00 01 02 03; do
+  curl -fL "https://github.com/kevin0818-lxd/deai/releases/download/v0.1.0/adapters.safetensors.part-$i" \
+    -o "template/adapters.safetensors.part-$i" || exit 1
+done
+cat template/adapters.safetensors.part-{00,01,02,03} > template/adapters.safetensors
 shasum -a 256 template/adapters.safetensors
 # 预期：77e9e088e7801d3196c6a3fff057b06353a2b75e4e1a4e9d99b3de41e5f230ab
 .venv/bin/python deai.py --adapter-path template \

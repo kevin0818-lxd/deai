@@ -9,6 +9,7 @@ __pycache__/
 *.log
 server.pid
 *.safetensors
+*.safetensors.part-*
 *.jsonl
 *.partial.txt
 .DS_Store

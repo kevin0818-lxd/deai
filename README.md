@@ -10,7 +10,7 @@
 
 ## 准备环境
 
-需要 Apple Silicon macOS、Python 3.11，以及足够内存和磁盘空间（24 GB 统一内存机器已测试训练；训练存档需要额外数 GB）。本仓库不包含基础模型；从 [TinyLlama-1.1B-Chat-v1.0](https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0) 下载 `config.json`、权重及 tokenizer 文件到 `model/`。模型许可证请以该模型卡为准。
+需要 Apple Silicon macOS、Python 3.11，以及足够内存和磁盘空间。本仓库不包含基础模型；从 [TinyLlama-1.1B-Chat-v1.0](https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0) 下载 `config.json`、权重及 tokenizer 文件到 `model/`。模型许可证请以该模型卡为准。
 
 ```bash
 git clone https://github.com/kevin0818-lxd/deai.git
@@ -51,13 +51,4 @@ shasum -a 256 template/adapters.safetensors
 
 数据增强具体实现见 [`style_data.py`](style_data.py)。没有安全变换的单元只使用弱的“去模板”增强；`report.json` 分开记录实质覆盖率及弱增强数。弱增强占比过高时，模型可能只学会删套话，不代表真正学到目标风格。请使用多段、多样化且有使用权的英文文本，并以独立人工改写样本检验质量。
 
-两种流程均可添加 `--spelling-rate 0.01 --grammar-rate 0.01` 开启输出层错误控制（分别取值 0–0.05，默认均为 0）；这会降低文本质量，不建议用于正式用途。`--seed` 控制数据拆分和抽样。CLI 仅接受本地文件，不提供 HTTP API。
-
-## 测试与发布边界
-
-```bash
-.venv/bin/python -m unittest -v test_deai.py
-DEAI_E2E=1 .venv/bin/python -m unittest -v test_deai.CLITests.test_one_step_training_and_inference
-```
-
-第二条会真实训练一次并在临时目录删除约数 GB 的测试权重。原创管道代码采用 [Apache-2.0](LICENSE)；基础模型、解析模型各遵循其自身许可。**不要提交**本地 `data/`、`model/`、`output/`、`runs/`、环境文件、日志或他人的语料。示例权重是独立的 Release 附件，并不包含训练数据；对训练数据来源、模型输出可否公开使用仍应按各自权利核实。
+两种流程均可添加 `--spelling-rate 0.01 --grammar-rate 0.01` 开启输出层错误控制（分别取值 0–0.05，默认均为 0）；这会降低文本质量，不建议用于正式用途。`--seed` 控制数据拆分和抽样。

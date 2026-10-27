@@ -1,0 +1,30 @@
+# Local assets require separate redistribution clearance.
+model/
+output/
+data/
+runs/
+.venv/
+__pycache__/
+*.pyc
+*.log
+server.pid
+*.safetensors
+*.jsonl
+*.partial.txt
+.DS_Store
+.trae/
+# Private deployment and legacy scripts are not part of the public CLI.
+humanize_server.py
+serve.zsh
+train.zsh
+test_dependency_perturb.py
+SHA256SUMS
+# Training and inference artifacts may contain user-supplied text or local paths.
+**/weights/
+**/result.txt
+adapter_config.json
+!template/adapter_config.json
+*.env
+.env*
+*.pem
+*.key

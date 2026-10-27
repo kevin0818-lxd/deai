@@ -1,0 +1,39 @@
+# TinyLlama-1.1B-Chat 全参微调（humanize 风格迁移）。
+#
+# 关于 fine_tune_type: full —— mlx-lm 的语义不是「全部参数」：
+#   mlx_lm/lora.py 先 model.freeze()，再只解冻最后 num_layers 个 decoder block。
+#   num_layers: -1 表示全部层（max(-1, 0) == 0 -> layers[0:]）。
+#   因此最终形态是：22 个 decoder block 全参训练，
+#   model.embed_tokens / lm_head / model.norm 保持冻结。
+#   实测 trainable 969.0M / 1100.0M = 88.08%。
+#
+# 显存账（bf16；MLX 的 Adam 动量 m/v 跟随参数 dtype，不是 fp32）：
+#   权重 2.20GB + 梯度 1.94GB + AdamW 动量 3.88GB ≈ 8.01GB（不含激活）
+#   24GB 与 18GB 机器均可容纳，不需要 8-bit Adam，也不需要调 iogpu.wired_limit。
+#
+# model / data / adapter_path 一律由 train.zsh 在命令行传入（命令行优先于本文件），
+# 本文件不写绝对路径，以免换机器后误指向不存在的目录。
+# train/test 必须写在这里：CLI 的 --train/--test 默认值是 None，只有 yaml 能给。
+train: true
+test: false
+fine_tune_type: full
+optimizer: adamw
+batch_size: 1
+grad_accumulation_steps: 1
+num_layers: -1
+grad_checkpoint: true
+mask_prompt: true
+max_seq_length: 2048
+iters: 720
+learning_rate: 0.00001
+lr_schedule:
+  name: cosine_decay
+  # 第 720 步是最后一步，衰减终点取 719。
+  arguments: [0.00001, 719, 0.000001]
+steps_per_report: 10
+# 一次验证要跑完 60 对（约 25 秒），40 步一验会占掉四分之一时间，故放到 120 步。
+steps_per_eval: 120
+val_batches: -1
+# 每次存档约 2.2 GB（全参权重，不是 LoRA 适配器）；另有结束时的一份最终权重。
+save_every: 240
+seed: 42

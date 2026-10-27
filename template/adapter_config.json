@@ -1,0 +1,5 @@
+{
+  "fine_tune_type": "full",
+  "num_layers": -1,
+  "lora_parameters": null
+}
